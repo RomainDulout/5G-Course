@@ -1,15 +1,17 @@
-## Understand and implement Blockchain functionalities
+## Comprendre et mettre en œuvre les fonctionnalités de la blockchain
 -------------
 
-For this practical exercise, we're going to use Geth (Go Ethereum), the Go implementation of Ethereum (https://geth.ethereum.org/). Other Ethereum implementations exist, but the Go version is still the most widespread and the easiest to learn.
+Pour cet exercice pratique, nous allons utiliser Geth (Go Ethereum), qui est l'implémentation d'Ethereum avec le langage GO (https://geth.ethereum.org/). Il existe d'autres implémentations d'Ethereum, mais la version Go reste la plus répandue et la plus facile à apprendre.
 
-The other important tool here is the solidity compiler (https://solidity.readthedocs.io/en/v0.4.21/), solc. This will enable us to compile the Solidity files used to implement smart contracts with Ethereum.
+L'autre outil important ici est le compilateur Solidity (https://solidity.readthedocs.io/en/v0.4.21/), solc. Il nous permettra de compiler les fichiers Solidity utilisés pour implémenter les smart contracts (contrats intelligents) avec Ethereum.
 
-Docker containers will be used for all these practical applications. This offers several advantages: 1) the possibility of deploying several nodes with different functionalities on the same machine; 2) the possibility of quickly testing different scenarios; and 3) the absence of any need to install tools other than Docker (AND Docker Compose) on the machine used.
+Les conteneurs Docker seront utilisés pour toutes ces applications pratiques. Cela présente plusieurs avantages : 1) la possibilité de déployer plusieurs nœuds avec des fonctionnalités différentes sur la même machine ; 2) la possibilité de tester rapidement différents scénarios ; et 3) l'absence de nécessité d'installer des outils autres que Docker (ET Docker Compose) sur la machine utilisée.
 
-It's worth noting that we'll be using a test environment, and therefore a private blockchain in which we can create users, allocate ethers, carry out transactions, develop and test smart contracts free of charge and quickly. There are also a number of Ethereum test networks (Testnet), but these are primarily aimed at testing smart contracts and not at experimenting with elements of the blockchain architecture.
+Il convient de noter que nous utiliserons un environnement de test, et donc une blockchain privée dans laquelle nous pouvons créer des utilisateurs, allouer des éthers, effectuer des transactions, développer et tester des contrats intelligents gratuitement et rapidement. Il existe également un certain nombre de réseaux de test Ethereum (Testnet), mais ceux-ci sont principalement destinés à tester des smart contracts et non à expérimenter des éléments de l'architecture de la blockchain.
 
-**Note:** At the end of the session, please send me a short report answering the questions asked in this practical exercise (leo.mendiboure@univ-eiffel.fr).
+**Important:** A la fin de la session, veuillez m'envoyer un court rapport par groupe de 2 étudiants répondant aux questions posées dans cet exercice pratique (romain.dulout@univ-eiffel.fr).
+
+
 
 ### A. Deploying a Blockchain network
 
