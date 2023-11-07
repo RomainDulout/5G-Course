@@ -1,4 +1,4 @@
-## Comprendre et mettre en œuvre les fonctionnalités de la blockchain
+# Comprendre et mettre en œuvre les fonctionnalités de la blockchain
 -------------
 
 Pour cet exercice pratique, nous allons utiliser Geth (Go Ethereum), qui est l'implémentation d'Ethereum avec le langage GO (https://geth.ethereum.org/). Il existe d'autres implémentations d'Ethereum, mais la version Go reste la plus répandue et la plus facile à apprendre.
@@ -11,17 +11,55 @@ Il convient de noter que nous utiliserons un environnement de test, et donc une 
 
 **Important:** A la fin de la session, veuillez m'envoyer un court rapport par groupe de 2 étudiants répondant aux questions posées dans cet exercice pratique (romain.dulout@univ-eiffel.fr).
 
+## Prérequis (15/20 minutes max)
+
+**Remarque** Cette partie peut être sautée par les personnes ayant des connaissances sur les principes et commandes de base de docker (l'idée de ce TP n'étant pas de vous former à docker et au devops de manière générale mais de vous introduire quelques concepts de la blockchain). 
+
+Qu'est-ce que docker ? 
+
+Docker est une plateforme de conteneurisation open-source qui permet d'emballer des applications et leurs dépendances dans des conteneurs légers, portables et isolés. En d'autres termes, il s'agit de machines virtuelles beaucoup plus légères, que l'on appelle des conteneurs lors de leurs phases d'exécution. Chaque conteneur docker partage le même noyau du système d'exploitation, là où les VMs émulent un système d'exploitation complet (y compris la mémoire, le stockage et le processeur).
+
+Les conteneurs Docker sont autonomes, ce qui signifie qu'ils incluent tout ce dont une application a besoin pour s'exécuter, y compris le code, les bibliothèques et les configurations.
+
+D'un point de vue technique, Docker offre de nombreux avantages en simplifiant notamment le déploiement et la gestion des applications, car les conteneurs peuvent être exécutés de manière cohérente sur n'importe quelle infrastructure compatible Docker (serveur, hôtes MAC OS, windows, linux) offrant une grande portabilité. 
+
+Enfin, Il affiche une efficacité et une flexibilité accrues, car les conteneurs peuvent être rapidement déployés, mis à jour et réduits, tout en garantissant l'isolation des applications.
+
+Il est aujourd'hui l'une des technologies centrales de l'approche DevOps (https://about.gitlab.com/topics/devops/), que tout nouveau développeur sur le marché se doit de connaître. 
+
+### Installation de Docker
+
+- **Etape 1:** Installez Docker sur votre machine locale.
+
+ Suivez le guide d'installation officiel de votre système d'exploitation (https://docs.docker.com/engine/install/ubuntu/).
+
+  ```shell
+  # Example for Linux (Ubuntu)
+  sudo apt-get update
+  sudo apt-get install docker-ce
+
+```
+
+Pour vérifier que Docker est correctement installé sur votre machine, vous pouvez utiliser la commande suivante :
+
+```shell
+docker run hello-world
+```
+Dans cette ligne de commande :
+  1. `docker` indique à votre système d'exploitation que vous utilisez le programme docker
+  2. `run` est l'une des différentes sous-commandes proposées par docker pour créer et exécuter un conteneur docker.
+  3. `hello-world` est utilisé pour indiquer à docker que vous utilisez une image spécifique qui sera chargée dans le conteneur.
 
 
-### A. Deploying a Blockchain network
+## A. Déploiement d'un réseau Blockchain
 
-The folder in which this ReadMe is located contains various files that can be used to launch a Blockchain network, including 1) two DockerFiles and 2) a Docker-Compose file.
+Le dossier dans lequel se trouve cet énoncé contient divers fichiers qui peuvent être utilisés pour lancer un réseau Blockchain, y compris 1) deux DockerFiles et 2) un fichier Docker-Compose.
 
-Use the command `docker-compose up -d` to launch the Blockchain network.
+Utilisez la commande `docker-compose up -d` pour lancer le réseau Blockchain.
 
-The Blockchain network you've just launched is made up of different types of node: 1) a BootNode, 2) a miner, 3) an RPC node and a user.
+Le réseau Blockchain que vous venez de lancer est composé de différents types de nœuds : 1) un BootNode, 2) un mineur (miner), 3) un RPC node et un utilisateur.
 
-**QA.1 Explain the role of the BootNode, Miner and RPC nodes in a Blockchain architecture.**
+**QA.1 Expliquer le rôle des nœuds BootNode, Miner et RPC dans une architecture de blockchain.**
 
 By analyzing the docker-compose.yaml file, we can see that the minor and RPC nodes attach themselves to the BootNode when they are initiated, which seems logical given the role of this node. By analyzing this file, we can also see 1) that the RPC node exposes a given port and 2) that all nodes are launched on a given subnet.
 
@@ -33,7 +71,7 @@ By analyzing the Dockerfile of the nodes (`Dockerfile.nodes`), you can now see t
 
 **QA.4 What is the role of the genesis block in a blockchain architecture?**
 
-### B. Communicating with a Blockchain network
+## B. Communicating with a Blockchain network
 
 We will now try to establish communication with this Blockchain network. To do this, we'll start by using JSON-RPC API endpoints (https://geth.ethereum.org/docs/interacting-with-geth/rpc).
 
@@ -61,7 +99,7 @@ Once attached, you can now check that everything is working properly by displayi
 
 At this point, if you wish, you can delete the second RPC node you've added. You won't need it for the rest of this tutorial.
 
-### C. Managing users
+## C. Managing users
 
 We're now going to create two additional users. To do this, you'll need to use the following command: personal.newAccount(). 
 
@@ -73,7 +111,7 @@ Check that both accounts now appear in the list of accounts associated with this
 
 **QC.3 What does the following function do? What do you think it is useful for?** `personal.unlockAccount(ACCOUNT, PASSWORD)`
 
-### D. Carrying out a first transaction 
+## D. Carrying out a first transaction 
 
 Now that our network is up and running, and we know how to connect and authenticate, we're going to make our first money transfer between two users. This is the basic function of a Blockchain network.
 
@@ -97,7 +135,7 @@ Note that you can specify the address of a given account (EMITTER/RECEIVER) usin
 
 **QD.5 What information about a transaction can be retrieved using the eth.getTransaction(NUMBER) function? What does gas mean in Ethereum?**
 
-### E. Deploying a first Smart Contract
+## E. Deploying a first Smart Contract
 
 **QE.1 What is a Smart Contract?**
 
