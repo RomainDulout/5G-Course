@@ -186,7 +186,7 @@ En analysant le Dockerfile des nodes (`Dockerfile.nodes`), vous pouvez maintenan
 
 Nous allons maintenant essayer d'établir une communication avec ce réseau Blockchain. Pour ce faire, nous commencerons par utiliser des API endpoints JSON-RPC (https://geth.ethereum.org/docs/interacting-with-geth/rpc).
 
-Pour ce faire, votre première tâche sera de mettre à jour le docker-compose pour ajouter un second nœud RPC, en associant son port 8045 au port 8046 de localhost.
+Pour ce faire, votre première tâche sera de mettre à jour le docker-compose pour ajouter un second nœud RPC, en associant son port 8545 au port 8546 de localhost.
 
 Une fois cela fait, vous devriez pouvoir tester que votre implémentation fonctionne (une nouvelle fois docker-compose up) en utilisant la commande suivante depuis localhost :  `curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"net_version","params":[],"id":67}' http://127.0.0.1:8545` 
 
@@ -198,7 +198,7 @@ Une fois cela fait, vous devriez pouvoir tester que votre implémentation foncti
 
 Nous allons maintenant découvrir une nouvelle façon de se connecter et d'interagir avec le nœud RPC. 
 
-Pour cela, nous allons nous connecter au client geth, qui fait partie du réseau Docker déployé. Comme vous pouvez le voir dans son fichier docker (`Dockerfile.user`), il possède tous les outils nécessaires : geth et solc en particulier.
+Pour cela, nous allons nous connecter au client geth (User1), qui fait partie du réseau Docker déployé. Comme vous pouvez le voir dans son fichier docker (`Dockerfile.user`), il possède tous les outils nécessaires : geth et solc en particulier.
 
 La ligne de connexion est la suivante :  `docker exec -it "CONTAINER_NAME" /bin/bash`. En utilisant `docker ps` vous devriez pouvoir retrouver le nom de ce conteneur.
 
@@ -257,32 +257,32 @@ Utilisez votre navigateur web pour accéder à `https://chriseth.github.io/brows
 Note (importante !): si vous utilisez la dernière version du compilateur, il se peut que cela ne fonctionne pas. Nous vous conseillons donc de modifier les paramètres de configuration pour utiliser une version fonctionnelle du compilateur telle que : `0.4.24+commit.e67f0147`.
 
 ```console
-// Store the bin file, remembering to add 0x so that it is correctly interpreted
-// as hexadecimal content and put quotation marks around it!
+// Stocker le fichier bin, en n'oubliant pas d'ajouter 0x pour qu'il soit correctement interprété
+// comme un contenu hexadécimal et mettez des guillemets autour de ce contenu !
 
 tirelireBin = '0x' + "<BIN from compiler!>"
 
-// Simple storage of the ABI in a variable (JSON format)
+// Stockage simple de l'ABI dans une variable (format JSON)
 
 tirelireAbi = <abi from compiler>
 
-// Tells Geth that this variable is an ABI: transform JSON into ABI
+// Indique à Geth que cette variable est un ABI : transforme JSON en ABI
 
 tirelireInterface = eth.contract(tirelireAbi)
 
-//Unlock the user to publish the smart contract
+//Déverrouille l'utilisateur pour publier le smart contract
 
 personal.unlockAccount(eth.accounts[0], "PASSWD")
 
-//Publish the smart contract
+//Publie le smart contract
 
 var tirelireTx = tirelireInterface.new({from: eth.accounts[0],data: tirelireBin,gas: 1000000})
 
-// Retrieve the hash
+// Recupère le hash
 
 tirelireTxHash = tirelireTx.transactionHash
 
-// Finally, we retrieve the contract address
+// Enfin, on récupère l'adresse du smart contract
 
 publishedTirelireAddr = eth.getTransactionReceipt(tirelireTxHash).contractAddress
 
@@ -300,7 +300,7 @@ Nous allons maintenant pousser notre contrat intelligent un peu plus loin en ajo
 
 Pour cela, commencez par copier le fichier tirelire.sol dans un nouveau fichier tirelire_2.sol, sur lequel vous travaillerez jusqu'à la fin de ce TP (afin de conserver une base valide du fichier).
 
-Ouvrez maintenant le fichier et créez une nouvelle variable uint publique nbAcces, que vous instancierez à 0 dans le constructeur. Cette fonction nous permettra de savoir combien de fois nous avons mis de l'argent dans notre tirelire, nous devrons donc l'incrémenter à chaque fois que nous appellerons la fonction give.
+Ouvrez maintenant le fichier et créez une nouvelle variable uint publique nbAcces, que vous instancierez à 0 dans le constructeur. Cette fonction nous permettra de savoir combien de fois nous avons mis de l'argent dans notre tirelire, nous devrons donc l'incrémenter à chaque fois que nous appellerons la fonction donner().
 
 Une fois ces trois étapes franchies (définition, instanciation et incrémentation), nous devons répéter les étapes de la question précédente avec le fichier tirelire_2.sol avant de pouvoir l'installer sur la blockchain.
 
@@ -310,9 +310,9 @@ Dans cette section, vous verrez qu'un contrat intelligent permet l'instanciation
 
 Nous allons maintenant définir une nouvelle valeur, qui correspondra à l'objectif que nous voulons atteindre, c'est-à-dire le nombre d'éthers que nous voulons avoir stocké dans notre tirelire avant de pouvoir en retirer de l'argent.
 
-Pour ce faire, toujours dans le même fichier, nous définissons d'abord une nouvelle valeur : goal, que nous instancions à l'adresse 100000000000000000 dans le constructeur.
+Pour ce faire, toujours dans le même fichier, nous définissons d'abord une nouvelle valeur : goal, que nous instancions à 100000000000000000 dans le constructeur.
 
-Une fois cela fait, nous ajouterons une nouvelle ligne à la fonction withdraw, qui devrait signifier que si le montant de notre compte d'épargne n'est pas supérieur ou égal à notre objectif (goal), nous ne pourrons pas retirer d'argent. Pour ce faire, vous pouvez utiliser la fonction assert, qui permet de vérifier si une assertion est vraie (similaire à un if).
+Une fois cela fait, nous ajouterons une nouvelle ligne à la fonction retirer, qui devrait signifier que si le montant de notre compte d'épargne n'est pas supérieur ou égal à notre objectif (goal), nous ne pourrons pas retirer d'argent. Pour ce faire, vous pouvez utiliser la fonction assert, qui permet de vérifier si une assertion est vraie (similaire à un if).
 
 **QE.3 Quelle ligne doit être ajoutée ? (c'est-à-dire donner la ligne de code)**
 
@@ -331,7 +331,7 @@ Après avoir versé de l'argent à l'un des autres utilisateurs, par exemple : e
 
 Comme vous pouvez le constater, un contrat intelligent est ouvert, et toute personne possédant l'adresse du contrat peut y accéder. Ainsi, n'importe quel utilisateur peut interagir avec les fonctions publiques de notre contrat, et comme c'est le cas ici, il pourrait être facile pour une personne malveillante de voler le contenu de notre tirelire....
 
-Pour ce faire, nous créons et instancions un nouveau propriétaire d'adresse à msg.sender dans le constructeur, et ajoutons un assert à la fonction withdraw pour vérifier que l'adresse correspond à l'adresse du créateur du smart contract.
+Pour ce faire, nous créons et instancions un nouvel élément qui contient l'adresse du créateur du smart contract, et ajoutons un assert à la fonction retirer pour vérifier que l'adresse correspond à l'adresse du créateur du smart contract.
 
 **QE.4 A quoi correspond la ligne à ajouter ? (c'est-à-dire donner la ligne de code)**
 
