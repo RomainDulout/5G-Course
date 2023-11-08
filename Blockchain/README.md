@@ -11,7 +11,7 @@ Il convient de noter que nous utiliserons un environnement de test, et donc une 
 
 **Important:** A la fin de la session, veuillez m'envoyer un court rapport par groupe de 2 étudiants répondant aux questions posées dans cet exercice pratique (romain.dulout@univ-eiffel.fr).
 
-## Prérequis (15/20 minutes max)
+## Prérequis (15 minutes max)
 
 **Remarque** Cette partie peut être sautée par les personnes ayant des connaissances sur les principes et commandes de base de docker (l'idée de ce TP n'étant pas de vous former à docker et au devops de manière générale mais de vous introduire quelques concepts de la blockchain). 
 
@@ -49,6 +49,116 @@ Dans cette ligne de commande :
   1. `docker` indique à votre système d'exploitation que vous utilisez le programme docker
   2. `run` est l'une des différentes sous-commandes proposées par docker pour créer et exécuter un conteneur docker.
   3. `hello-world` est utilisé pour indiquer à docker que vous utilisez une image spécifique qui sera chargée dans le conteneur.
+
+### 2. Télécharger (pull) et exécuter (run) une image Docker 
+
+- **Étape 1:** Télécharger (pull) une image Docker.
+
+  Téléchargez l'image Docker "nginx".
+
+   ```shell
+  docker pull nginx
+  ```
+
+  - **Étape 2:** Lancer un conteneur NGINX.
+
+  Démarrez un conteneur NGINX en mode détaché.
+
+  ```shell
+  docker run -d -p 8080:80 nginx
+  ```
+
+- **Étape 3:** Accédez au serveur web NGINX.
+
+  Ouvrez un navigateur web et naviguez jusqu'à `http://localhost:8080`.
+
+Vous venez de lancer votre premier environnement conteneurisé, à partir de l'image NGINX (dtéléchargé depuis dockerhub, librairie en ligne qui contient l'ensemble des images docker).
+
+Nous allons voir maintenant comment créer vos propres images Docker.
+
+### Construire son image docker
+
+- **Étape 1:** Créez un répertoire pour votre projet Docker.
+- **Étape 2:** Créez un fichier Docker avec les instructions pour construire un serveur web personnalisé en utilisant NGINX. (exemple de fichier index.html dans ce dossier)
+
+  ```Dockerfile
+  # Utilisez l'image de base officielle de NGINX
+  FROM nginx
+
+  # Copiez vos fichiers HTML personnalisés à la racine du document NGINX
+  COPY custom-html-files /usr/share/nginx/html
+  ```
+
+- **Étape 3:** Construire l'image Docker personnalisée.
+
+  ``shell
+  docker build -t my-web-server .
+  ```
+
+- **Étape 4:** Exécutez un conteneur à partir de votre image personnalisée.
+
+  ``shell
+  docker run -d -p 8081:80 mon-serveur-web
+  ```
+
+- **Étape 5:** Accédez au serveur web personnalisé.
+
+  Ouvrez un navigateur web et naviguez jusqu'à `http://localhost:8081`.
+
+Vous venez de créer votre image NGINX custom, et lancer ce nouvel environnement conteneurisé.
+Nous allons à présent lancer des environnements plus complexes à l'aide de l'orchestrateur de conteneurs docker : docker-compose.
+
+### Orchestration de plusieurs conteneurs docker
+
+- **Étape 1:** Installez Docker Compose.
+
+  Suivez le guide d'installation officiel de Docker Compose sur votre système d'exploitation (vous pouvez essayer d'exécuter le script situé dans ce dossier). 
+
+- **Étape 2:** Créez un répertoire de projet Docker Compose.
+
+  Créez un répertoire nommé `my-docker-app` pour votre projet Docker Compose.
+
+- **Étape 3:** Définissez un fichier YAML pour Docker Compose.
+
+Créez un fichier nommé `docker-compose.yml` dans le répertoire du projet et définissez-y des services (qui sont nos conteneurs). Par exemple, créez des services pour une application web et une base de données (par exemple, WordPress et MySQL).
+
+
+  ```yaml
+  version: '3'
+  services:
+    wordpress:
+      image: wordpress:latest
+      ports:
+        - "8080:80"
+      environment:
+        WORDPRESS_DB_HOST: db
+        WORDPRESS_DB_USER: exampleuser
+        WORDPRESS_DB_PASSWORD: examplepassword
+        WORDPRESS_DB_NAME: exampledb
+    db:
+      image: mysql:5.7
+      environment:
+        MYSQL_ROOT_PASSWORD: examplepassword
+        MYSQL_USER: exampleuser
+        MYSQL_PASSWORD: examplepassword
+        MYSQL_DATABASE: exampledb
+  ```
+
+- **Étape 4:** Démarrez les services Docker Compose.
+
+  Exécutez la commande suivante dans le répertoire du projet pour démarrer les services définis en mode détaché.
+
+  ``Shell
+  docker-compose up -d
+  ```
+
+- **Étape 5:** Accédez à l'application.
+
+  Ouvrez un navigateur web et naviguez vers `http://localhost:8080`.
+
+Vous venez de lancer un environnement complexe dans lequel plusieurs services (conteneurs) interdépendant sont initialisés puis exécutés. 
+
+Vous n'aurez pas dans la suite du TP le besoin de connaître l'ensemble de ces commandes, retenez simplement la philosophie.
 
 
 ## A. Déploiement d'un réseau Blockchain
