@@ -50,6 +50,24 @@ Dans cette ligne de commande :
   2. `run` est l'une des différentes sous-commandes proposées par docker pour créer et exécuter un conteneur docker.
   3. `hello-world` est utilisé pour indiquer à docker que vous utilisez une image spécifique qui sera chargée dans le conteneur.
 
+- **Etape 2:** Gestion des autorisations Docker (exécuter commande docker sans être root).
+
+Avec une installation de base de Docker sur un système Linux, l'utilisation de docker est généralement limitée à l'utilisateur root. les commandes suivantes vont vous permettre de lancer des commandes sans être root : 
+
+```shell
+sudo groupadd -f docker
+
+# Si ce n'est pas déjà le cas, il faudra veiller à ce que le socket utilisé par Docker appartienne bien à ce groupe
+sudo chown root:docker /var/run/docker.sock
+
+sudo usermod -a -G docker "$(whoami)"
+
+newgrp docker
+
+sudo systemctl restart docker
+```
+
+
 ### Télécharger (pull) et exécuter (run) une image Docker 
 
 - **Étape 1:** Téléchargez (pull) une image Docker.
@@ -205,7 +223,7 @@ mininet> h1 ping h2 # montre comment faire un ping de h1 à h2
 
 **Q.2** A quoi servent les commandes pingall, iperf, xterm, ifconfig, dump, links et net dans mininet ?
 
-**Pour activer l'utilisation de xterm dans le conteneur docker, vous devrez utiliser la commande suivante `xhost +si:localuser:root`**.
+**Pour activer l'utilisation de xterm dans le conteneur docker, vous devrez utiliser la commande suivante `xhost +si:localuser:root` à executer sur votre host (et avant de lancer le conteneur)**.
 
 **Q.3** Les switchs de votre instance mininet sont configurés comme "learning switch" par défaut.
   * Qu'est-ce qu'un "learning switch"? Quel est le résultat de pingall lorsque le learning switch est utilisé ?
@@ -276,7 +294,7 @@ Ce que nous allons faire ici est simple :
 
   * Indiquer à mininet que le contrôleur à utiliser n'est pas le contrôleur par défaut mais le contrôleur Ryu (nous allons simplement "brancher" le contrôleur Ryu sur la topologie que nous venons de définir).
 
-**Le contrôleur Ryu, en tant que Mininet, fonctionnera dans son propre conteneur Docker**
+**Le contrôleur Ryu, comme Mininet, fonctionnera dans son propre conteneur Docker**
 
 Vous devrez donc utiliser une image Docker d'un contrôleur Ryu (https://hub.docker.com/r/osrg/ryu) et l'exécuter dans le même réseau local Docker.
 
@@ -290,26 +308,26 @@ ryu-manager ryu/ryu/app/simple_switch_13.py
 Une fois cela fait, dans le conteneur Mininet, vous devrez indiquer à votre réseau virtuel d'utiliser ce contrôleur :
 
 ```console
-sudo mn --custom <lien vers fichier custom>.py --topo customtopo --controller remote,ip=<IP_adress of_the_Ryu_container> --link tc --switch=ovsk,protocols=OpenFlow13
+mn --custom <lien vers fichier custom>.py --topo customtopo --controller remote,ip=<IP_adress of_the_Ryu_container> --link tc --switch=ovsk,protocols=OpenFlow13
 ```
 
 *Note:* L'option `--link tc` devrait permettre de spécifier différents types d'options concernant les liens (bande passante, délai, perte) et est nécessaire.
 
 **Q.6-7** Maintenant que cette topologie est en place, effectuez un test : Quel est le résultat d'un `pingall` ?
 
-**Q.8** En utilisant une commande que vous avez vue plus tôt, spécifiez les liens entre les différentes interfaces (s1-eth1:h1-eth0, etc.). En modifiant votre fichier de topologie personnalisé, supprimez le lien entre s1 et s2. Essayez de refaire un `pingall`, que se passe-t-il ?
+**Q.8** En utilisant une commande que vous avez vue plus tôt, spécifiez les liens entre les différentes interfaces (s1-eth1:h1-eth0, etc.). En modifiant votre fichier de topologie personnalisé, supprimez le lien entre s1 et s2. Essayez de refaire un `pingall`, que se passe-t-il (Pensez à relancer le contrôleur: ryu-manager ryu/ryu/app/simple_switch_13.py)?
 
-Comme vous pouvez le voir dans le dossier `ryu/ryu/app/`, et comme nous le verrons dans la suite de ce tutoriel, il y a beaucoup d'exemples différents d'utilisation de Ryu et des contrôleurs et commutateurs. Nous pouvons observer que certains d'entre eux (notamment simple_switch_stp.py) proposent une utilisation du STP.
+Comme vous pouvez le voir dans le dossier `ryu/ryu/app/`, et comme nous le verrons dans la suite de ce tutoriel, il y a beaucoup d'exemples différents d'utilisation de Ryu et des contrôleurs et switchs. Nous pouvons observer que certains d'entre eux (notamment simple_switch_stp.py) proposent une utilisation du STP.
 
 **Q.9** Qu'est-ce que le Spanning Tree Protocol (STP) ? Quel peut être son intérêt ici ? Pourrait-il nous aider à corriger le problème que nous avons découvert ? 
 
  ## 2. Openflow ###
 
-Comme vous le savez, une architecture SDN est composée de trois couches principales : Application - Contrôle - Infrastructure. Le protocole le plus courant pour la communication entre la couche contrôle (contrôleurs SDN) et la couche infrastructure (commutateurs) est Openflow. Il s'agit d'un protocole de communication qui permet au contrôleur d'avoir accès au "Forwarding plane" des switchs et des routeurs. Différentes versions de ce protocole existent et dans ce tutoriel, comme vous l'avez peut-être déjà compris, nous nous concentrerons sur la version 1.3.
+Comme vous le savez, une architecture SDN est composée de trois couches principales : Application - Contrôle - Infrastructure. Le protocole le plus courant pour la communication entre la couche contrôle (contrôleurs SDN) et la couche infrastructure (switchs) est Openflow. Il s'agit d'un protocole de communication qui permet au contrôleur d'avoir accès au "Forwarding plane" des switchs et des routeurs. Différentes versions de ce protocole existent et dans ce tutoriel, comme vous l'avez peut-être déjà compris, nous nous concentrerons sur la version 1.3.
 
 ### 2.1 Retour au fonctionnement des switchs traditionnels ###
 
-**Q.10** Rappelez le fonctionnement des commutateurs L2 traditionnels (c'est-à-dire les commutateurs de niveau 2 du modèle OSI) :
+**Q.10** Rappelez le fonctionnement des switchs L2 traditionnels (c'est-à-dire les commutateurs de niveau 2 du modèle OSI) :
   * Y a-t-il une séparation entre le plan de contrôle et le plan de données ?
   * Quel type de données la table de transfert contient-elle ? Quel type de données est traité au niveau 2 ?
   * Comment cette table est-elle mise à jour ?
@@ -328,7 +346,7 @@ Nous allons maintenant essayer de voir ce qu'elle peut faire en pratique. Pour c
 
 Nous allons ensuite lancer l'émulateur Mininet avec une topologie linéaire composée de 6 switchs :
 
-`sudo mn --controller=remote,ip=<IP> --switch=ovsk,protocols=OpenFlow13 --topo=linear,6`
+`mn --controller=remote,ip=<IP> --switch=ovsk,protocols=OpenFlow13 --topo=linear,6`
 
 Ce que nous voulons faire maintenant, c'est observer les échanges entre les différents switchs, et entre les switchs et le contrôleur.
 
@@ -377,7 +395,7 @@ Maintenant que nous avons compris comment utiliser l'émulateur Mininet (créati
 
 Tout d'abord, pour réutiliser les commandes/concepts précédent, nous allons essayer d'afficher le Topology Viewer Gui offert par Ryu : https://ryu.readthedocs.io/en/latest/gui.html
 
-Cette topologie Gui peut être lancée avec la commande suivante (**avec le contrôleur déjà lancé**) dans le conteneur Ryu : `ryu run --observe-links ryu/app/gui_topology/gui_topology.py`
+Cette topologie Gui peut être lancée avec la commande suivante (**avec le contrôleur déjà lancé**) dans le conteneur Ryu : `ryu run --observe-links ryu/ryu/app/gui_topology/gui_topology.py`
 
 Cette topologie Gui s'exécute sur le port 8080. Nous voudrons l'afficher à l'adresse : http://localhost:8080.
 
@@ -391,7 +409,7 @@ Dans la première partie de ce tutoriel, nous avons vu qu'en présence de redond
 
 Ainsi, nous allons :
   - dans un premier terminal, lancer une application SDN Ryu basée sur le protocole STP : `ryu-manager simple_switch_stp_13.py` ;
-  - dans un second terminal, lancer la commande mininet pour utiliser la topologie que vous avez définie en 1.2.
+  - dans un second terminal, lancer la commande mininet pour utiliser la topologie que vous avez définie en 1.2 (Pensez à rajouter de nouveau le lien que vous avez supprimé).
   
 **Note : Le fichier simple_switch_stp_13.py est dans le dossier my_apps ! Vous pouvez 1) utiliser docker cp pour le copier dans votre conteneur ou 2) l'installer dans le conteneur et git cloner ce projet**. 
 
@@ -509,7 +527,7 @@ Sur cette ligne, vous ne devrez modifier que les mots-clés *IP_SRC* et *IP_DEST
 **Une fois cette modification effectuée, vérifiez qu'elle a bien été prise en compte. Pour ce faire 
   * redémarrez le contrôleur avec le fichier que vous venez de modifier,
   * Exécutez à nouveau une configuration Mininet de base et faites un ping ; 
-  * utiliser la commande `sudo ovs-ofctl -O Openflow13 dump-flows s1` pour voir si la règle que vous venez de définir apparaît.
+  * utiliser la commande `ovs-ofctl -O Openflow13 dump-flows s1` pour voir si la règle que vous venez de définir apparaît.
 
 OpenFlow présente de nombreux avantages. Par exemple, il est très facile d'ajouter de nouvelles règles pour modifier le comportement du commutateur et ajouter de nouvelles fonctionnalités. Par exemple, on peut décider de dupliquer tout ou partie du trafic destiné à un port vers un autre port, par exemple pour "brancher" un dispositif contrôlant le trafic.
 
@@ -520,8 +538,8 @@ OpenFlow présente de nombreux avantages. Par exemple, il est très facile d'ajo
 Pour vérifier que les changements que vous venez d'effectuer fonctionnent :
   * Exécutez un contrôleur Ryu avec le programme que vous venez de modifier,
   * Exécutez Mininet avec un switch et 3 hôtes (n'oubliez pas de spécifier le protocole !),
-  * Dans un troisième terminal, scannez les paquets TCP reçus par l'hôte 3 : `sudo tcpdump -i s1-eth3`,
-  * Dans un quatrième terminal, examinez les paquets TCP reçus par l'hôte 2 : `sudo tcpdump -i s1-eth2`,
+  * Dans un troisième terminal, scannez les paquets TCP reçus par l'hôte 3 : `tcpdump -i s1-eth3`,
+  * Dans un quatrième terminal, examinez les paquets TCP reçus par l'hôte 2 : `tcpdump -i s1-eth2`,
   * Dans Mininet, faites un ping de l'hôte 1 à l'hôte 2, vérifiez que le trafic est dupliqué et que l'hôte 3 le reçoit également.
 
 #### 3.2.3 Définition des règles de niveau 4 ####
@@ -589,7 +607,7 @@ Maintenant que l'environnement est prêt, dans un troisième terminal tapez la c
 
 #### 3.3.2 Mise en place de Firewall ####
 
-Maintenant que nous avons vu que les APIs veulent nous permettre d'interagir avec le contrôleur, nous allons aller plus loin en utilisant ces APIs pour mettre en place un pare-feu.
+Maintenant que nous avons vu que les APIs peuvent nous permettre d'interagir avec le contrôleur, nous allons aller plus loin en utilisant ces APIs pour mettre en place un pare-feu.
 
 Pour ce faire, différentes commandes seront utiles :
 
@@ -617,7 +635,7 @@ $ wget http://X.X.X.X # check if non-ICMP packets are received (in Xterm)
 Grâce à toutes ces commandes, qui vous permettent d'accéder aux APIs du firewall, vous devriez être en mesure de compléter cette partie.
 
 Pour cela, nous allons commencer par :
-  * Lancer mininet dans un premier terminal : `sudo mn --topo single,3 --switch ovsk --controller remote`
+  * Lancer mininet dans un premier terminal : `mn --topo single,3 --switch ovsk --controller remote`
   * Exécuter le firewall dans un second terminal : `ryu-manager --verbose ryu/ryu/app/rest_firewall.py`
   * Par défaut, le pare-feu n'est pas activé, vous devrez donc l'activer avec les deux commandes ci-dessus et vérifier qu'il est bien activé.
   * Vous pouvez également vérifier le fonctionnement du système en effectuant un ping entre deux hôtes.
