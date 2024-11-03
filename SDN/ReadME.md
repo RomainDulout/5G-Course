@@ -313,11 +313,9 @@ mn --custom <lien vers fichier custom>.py --topo customtopo --controller remote,
 
 *Note:* L'option `--link tc` devrait permettre de spécifier différents types d'options concernant les liens (bande passante, délai, perte) et est nécessaire.
 
-**Q.6-7** Maintenant que cette topologie est en place, effectuez un test : Quel est le résultat d'un `pingall` ?
+**Q.6-7** Maintenant que cette topologie est en place, effectuez un test : Quel est le résultat d'un `pingall` ? (expliquez)
 
-**Q.8** En utilisant une commande que vous avez vue plus tôt, spécifiez les liens entre les différentes interfaces (s1-eth1:h1-eth0, etc.). En modifiant votre fichier de topologie personnalisé, supprimez le lien entre s1 et s2. Essayez de refaire un `pingall`, que se passe-t-il (Pensez à relancer le contrôleur: ryu-manager ryu/ryu/app/simple_switch_13.py)?
-
-Comme vous pouvez le voir dans le dossier `ryu/ryu/app/`, et comme nous le verrons dans la suite de ce tutoriel, il y a beaucoup d'exemples différents d'utilisation de Ryu et des contrôleurs et switchs. Nous pouvons observer que certains d'entre eux (notamment simple_switch_stp.py) proposent une utilisation du STP.
+**Q.8** Dans le cas où les pings ne marcheraient pas, détaillez la procédure à mettre en place pour lever le problème, et tester le bon fonctionnement du pingall.
 
 **Q.9** Qu'est-ce que le Spanning Tree Protocol (STP) ? Quel peut être son intérêt ici ? Pourrait-il nous aider à corriger le problème que nous avons découvert ? 
 
